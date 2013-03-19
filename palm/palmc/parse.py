@@ -2,11 +2,13 @@ from simpleparse.parser import Parser
 from simpleparse.dispatchprocessor import DispatchProcessor, dispatch, dispatchList, lines
 
 protofile = r'''
-root                    := whitespace*, message_or_import+
+root                    := whitespace*, option*, package, message_or_import+
 <whitespace>            := comment / [ \t\n]
-comment                 := one_line_comment / multi_line_comment / package
+comment                 := one_line_comment / multi_line_comment
 one_line_comment        := "//", -"\n"*
 multi_line_comment      := "/*", -"*/"*, "*/"
+option                  := "option", whitespace+, [a-zA-Z], [a-zA-Z0-9_]*, whitespace+, "="!, whitespace+, option_value, ";"!, whitespace*
+option_value            := "true" / "false"
 package                 := "package", whitespace+, [a-zA-Z], [a-zA-Z0-9_.]*, ";"!, whitespace*
 >message_or_import<     := message / enum / import / option
 message                 := message_start, message_label!, whitespace*, message_body, whitespace*
@@ -37,7 +39,6 @@ enum_label              := [a-zA-Z], [a-z0-9A-Z_]*
 enum_code               := [0-9]+
 >import<                := "import", whitespace+!, '"'!, import_path, '"'!, whitespace*, ";"!, whitespace*
 import_path             := -'"'*
-<option>                := "option", -';'*, ";"!, whitespace*
 '''
 
 class Reference(object):
@@ -56,7 +57,7 @@ class Reference(object):
 
         """
         assert not scope or scope[-1] == ".", "Invalid scope: %r" % scope
-        return "%s%s" % (scope, self.name)
+        return "".join(scope, self.name)
 
 class ProtoParseError(Exception):
     def __init__(self, start, end, buf, message):
@@ -167,6 +168,12 @@ class ProtoProcessor(DispatchProcessor):
     def import_path(self, (tag, start, stop, subtags), buffer):
         path = buffer[start:stop]
         return path
+
+    def option(self, (tag, start, stop, subtags), buffer):
+        print 'option: ', tag
+
+    def package(self, (tag, start, stop, subtags), buffer):
+        print 'package: ', tag
 
 class ProtoParser(Parser):
     def buildProcessor(self):
