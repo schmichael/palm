@@ -9,7 +9,7 @@ one_line_comment        := "//", -"\n"*
 multi_line_comment      := "/*", -"*/"*, "*/"
 option                  := "option", whitespace+, [a-zA-Z], [a-zA-Z0-9_]*, whitespace+, "="!, whitespace+, option_value, ";"!, whitespace*
 option_value            := "true" / "false"
-package                 := "package", whitespace+, [a-zA-Z], [a-zA-Z0-9_.]*, ";"!, whitespace*
+package                 := "package", whitespace+, field_type, whitespace*, ";"!, whitespace*
 >message_or_import<     := message / enum / import / option
 message                 := message_start, message_label!, whitespace*, message_body, whitespace*
 <message_start>         := "message", whitespace+
@@ -20,7 +20,7 @@ message_body            := "{"!,whitespace*,field_list,whitespace*,"}"!
 >field_opt<             := message / enum / field
 field                   := field_require, whitespace+!, field_type!, whitespace+!, field_name!, whitespace*, "="!, whitespace*, field_num!, whitespace*, field_default?, ";"!, whitespace*
 field_require           := "repeated" / "optional" / "required"
-field_type              := [a-zA-Z], [a-z0-9A-Z_]*
+field_type              := [a-zA-Z], [a-z0-9A-Z_.]*
 field_name              := [a-zA-Z], [a-z0-9A-Z_]*
 field_num               := [0-9]+
 field_default           := "[", "default", whitespace*, "=", whitespace*, field_default_value, whitespace*, "]"
