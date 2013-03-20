@@ -10,7 +10,7 @@ multi_line_comment      := "/*", -"*/"*, "*/"
 option                  := "option", whitespace+, [a-zA-Z], [a-zA-Z0-9_]*, whitespace+, "="!, whitespace+, option_value, ";"!, whitespace*
 option_value            := "true" / "false"
 package                 := "package", whitespace+, field_type, whitespace*, ";"!, whitespace*
->message_or_import<     := message / enum / import / option
+>message_or_import<     := message / enum / import
 message                 := message_start, message_label!, whitespace*, message_body, whitespace*
 <message_start>         := "message", whitespace+
 message_label           := [a-zA-Z], [a-z0-9A-Z_]*
@@ -170,10 +170,10 @@ class ProtoProcessor(DispatchProcessor):
         return path
 
     def option(self, (tag, start, stop, subtags), buffer):
-        print 'option: ', tag
+        return buffer[start:stop]
 
     def package(self, (tag, start, stop, subtags), buffer):
-        print 'package: ', tag
+        return buffer[start:stop]
 
 class ProtoParser(Parser):
     def buildProcessor(self):
